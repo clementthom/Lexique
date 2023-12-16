@@ -16,29 +16,29 @@ int main(int args, char *argv[]) {
     int nombreElement = scanDir();
     int choix = 2;
     initialisationLexique();
-    do  {
+    do {
         afficherMenu();
         choix = choixMenu();
-        //actionMenu(choix);
+        actionMenu(choix);
         printf("%d", choix);
-        creerFichier();
         //exit(EXIT_FAILURE);
-    }while(choix!=5);
+    } while (choix!=5);
 }
 
 
 
 void creerFichier() {
     char *nomLexique = NULL;
-    nomLexique = malloc(sizeof(char)*100);
+    nomLexique = malloc(sizeof(char) * 10);
     printf("\n\nChoisissez un nom de fichier : \n");
-    nomLexique = fgets(nomLexique, sizeof(nomLexique), stdin);
+    nomLexique = fgets(nomLexique, sizeof(char) * 10, stdin);
     FILE *lexique = NULL;
     char *nomFichier = NULL;
-    nomFichier = malloc(sizeof(char)*105); 
+    nomFichier = malloc(sizeof(char) * 15); 
     nomLexique[strlen(nomLexique)-1] = '\0';
     nomFichier = strcat(nomLexique, ".txt");
-    fopen(nomFichier, "a+"); 
+    fopen(nomFichier, "a+");
+    fclose(lexique);
 }
 
 int scanAfficherDir() { 
@@ -98,7 +98,21 @@ void afficherMenu() {
 
 int choixMenu() {
     int choixMenu = 0;
-    scanf("%d", &choixMenu);
+
+    const int bufsize = 100;
+    char buf[bufsize];
+
+    int ret;
+    // char word[bufsize];
+    fgets(buf, bufsize, stdin);
+
+    ret = sscanf(buf, "%d", &choixMenu);
+
+    if (ret != 1) {
+        fprintf(stderr, "J'ai dit un nombre abruti !!!\n");
+        return 0;
+    }
+
     printf("\n%d", choixMenu);
     return choixMenu;
 }
