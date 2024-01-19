@@ -20,7 +20,6 @@ int main(int args, char *argv[]) {
         afficherMenu();
         choix = choixMenu();
         actionMenu(choix);
-        printf("%d", choix);
         //exit(EXIT_FAILURE);
     } while (choix!=5);
 }
@@ -42,9 +41,6 @@ void creerFichier() {
     fprintf(lexique, "            %s\n\n", nomLexique);
     fclose(lexique);
 
-    free(nomLexique);
-    free(lexique);
-    free(nomFichier);
 }
 
 int scanAfficherDir() { 
@@ -134,16 +130,19 @@ void actionMenu(int choix) {
             break;
         case 2 :
             char *currentFileName = NULL;
-            currentFileName = malloc(sizeof(char)*20);
+            //currentFileName = malloc(sizeof(char)*20);
             printf("Selectionner un lexique : \n");
-            FILE *currentFile = SelectionLexiqueDansDossier(currentFileName);
+            FILE *currentFile = NULL;
+            currentFile = SelectionLexiqueDansDossier(&currentFileName);
+            if(currentFile == NULL) {
+                printf("Il n'y a pas de lexiques crees !\n\n");
+                break;
+            }
             //le & permet de changer la valeur du pointeur dans la fonction
-            printf("\n%s\n hooo/n", currentFileName);
-            currentFile = fopen("salut.txt", "a+");
-            
-            /*currentFile = fopen("test.txt", "a+");
-            printf("Entrer votre saisie (100 caractères max)");
-            fprintf(currentFile, "%s", entrerMot(100));*/
+            printf("Entrer votre saisie (200 caractères max) : \n");
+            fprintf(currentFile, " - ");
+            fprintf(currentFile, "%s", entrerMot(200));
+            fclose(currentFile);
             break;
         case 3 :
             printf("Coucou");
@@ -165,7 +164,7 @@ void actionMenu(int choix) {
     }
 }
 
-FILE *SelectionLexiqueDansDossier(char *nomLexique) { //on va modifier nomLexique dans la fonction
+FILE *SelectionLexiqueDansDossier(char **nomLexique) { //on va modifier nomLexique dans la fonction
     WIN32_FIND_DATA File; 
     HANDLE hSearch;
     HANDLE hSearch2; 
@@ -181,9 +180,12 @@ FILE *SelectionLexiqueDansDossier(char *nomLexique) { //on va modifier nomLexiqu
         } while (FindNextFile(hSearch, &File)); 
   
         FindClose(hSearch); 
-    } 
+    }
     //selectionner le fichier texte
     FILE *fichier = NULL;
+    if(fileIndex==0) {
+        return fichier;
+    } 
     int choixLexique = choixMenu();//choixMenu sert ici à selectionner un entier
     while(choixLexique<=0 || choixLexique>fileIndex) {
         printf("\n\nHors champ. \n Reentrez un nombre.\n\n");
@@ -194,21 +196,23 @@ FILE *SelectionLexiqueDansDossier(char *nomLexique) { //on va modifier nomLexiqu
         for (int i = 0; i<choixLexique; i++) {
             FindNextFile(hSearch, &File);
         }
-        nomLexique =  File.cFileName; 
-        FindClose(hSearch2); 
+        *(nomLexique) =  File.cFileName;//le nom du fichier est donné en RAM avec .txt
+        fichier = fopen(*(nomLexique), "a+"); 
+        FindClose(hSearch2);    
     }
-    printf("\nnomlexiwue = %s\n", nomLexique);
     return fichier; 
 }
 
 char *entrerMot(int nbChar) { //permet de renvoyer des mots de nbChar caractères
     char *mot = NULL;
     mot = malloc(sizeof(char)*nbChar+5); //+5 par sécurité
-    mot = fgets(mot, sizeof(char) * 10, stdin);
-    while(*mot = EOF){
+    mot = fgets(mot, sizeof(char) * nbChar, stdin);
+    /*while(*mot = EOF){
         printf("Saisie trop longue. Veuillez essayer avec moins de caractères.");
         mot = fgets(mot, sizeof(char) * 10, stdin);
-    }
+    }*/
+    return mot;
+    
 }
 
 char *lireLigne(FILE *fichier, int numeroLigne) {//lit la ligne jusqu'au saut de ligne
