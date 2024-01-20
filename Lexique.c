@@ -94,8 +94,6 @@ void afficherMenu() {
     printf("3 : Choisir un fichier a modifier\n");
     printf("4 : Gerer les lexiques\n");
     printf("5 : Quitter le logiciel\n");
-
-    
 }
 
 int choixMenu() {
@@ -130,7 +128,6 @@ void actionMenu(int choix) {
             break;
         case 2 :
             char *currentFileName = NULL;
-            //currentFileName = malloc(sizeof(char)*20);
             printf("Selectionner un lexique : \n");
             FILE *currentFile = NULL;
             currentFile = SelectionLexiqueDansDossier(&currentFileName);
@@ -145,14 +142,10 @@ void actionMenu(int choix) {
             fclose(currentFile);
             break;
         case 3 :
-            printf("Coucou");
+            actionModifierlexique();
             break;
         case 4 :
-            printf("1 : Afficher les lexiques");
-            printf("2 : Renommer un lexique");
-            printf("3 : Supprimer un lexique");
-            /*printf("\nVoici la liste des fichiers : \n");
-            scanDir();*/
+            actionGererlexique();
             break;
         case 5 :
             printf("\nAu revoir\n");
@@ -193,7 +186,7 @@ FILE *SelectionLexiqueDansDossier(char **nomLexique) { //on va modifier nomLexiq
     }
     hSearch2 = FindFirstFile("*.txt*", &File);
     if (hSearch != INVALID_HANDLE_VALUE) { 
-        for (int i = 0; i<choixLexique; i++) {
+        for (int i = 1; i<choixLexique; i++) {
             FindNextFile(hSearch, &File);
         }
         *(nomLexique) =  File.cFileName;//le nom du fichier est donné en RAM avec .txt
@@ -220,15 +213,12 @@ char *lireLigne(FILE *fichier, int numeroLigne) {//lit la ligne jusqu'au saut de
     contenuLigne = malloc(sizeof(fichier));
     int nbSautDeLigneCurseur = 0;
     fseek(fichier, 0, SEEK_SET);//on met le curseur au début du fichier
-    char caractereLu;
-    while(nbSautDeLigneCurseur<numeroLigne+1) {
+    char caractereLu;    
+    do {
         caractereLu = fgetc(fichier);
-        while(caractereLu != '\n') {
-            fseek(fichier, 1, SEEK_CUR); //on fait avancer le curseur de 1
-            caractereLu = fgetc(fichier);
-        }
+        fseek(fichier, 1, SEEK_CUR); //on fait avancer le curseur de 1
+    }while(caractereLu != '\n');
         nbSautDeLigneCurseur ++;
-    }
     fseek(fichier, 1, SEEK_CUR);//on est à la ligne souhaitée
     int tailleLigne = 1;
     caractereLu = fgetc(fichier);
@@ -239,4 +229,83 @@ char *lireLigne(FILE *fichier, int numeroLigne) {//lit la ligne jusqu'au saut de
     printf("%s", &contenuLigne);
     printf("hoa");
     return contenuLigne;
+}
+
+void actionGererlexique() {
+    afficherMenuGererlexique();
+    int choix = choixMenu();
+    switch(choix) {
+        case 0 :
+            printf("Pas un nombre");
+            break;
+        case 1 :
+            printf("\nVoici la liste des fichiers : \n");
+            scanDir();
+            break;
+        case 2 :
+            char *currentFileName = NULL;
+            printf("Selectionner un lexique : \n");
+            FILE *currentFile = NULL;
+            currentFile = SelectionLexiqueDansDossier(&currentFileName);
+            if(currentFile == NULL) {
+                printf("Il n'y a pas de lexiques crees !\n\n");
+                break;
+            }
+            break;
+        case 3 :
+            printf("Selectionner un lexique : \n");
+            currentFile = fopen(currentFileName, "a+");
+            currentFile = SelectionLexiqueDansDossier(&currentFileName);
+            if(currentFile == NULL) {
+                printf("Il n'y a pas de lexiques crees !\n\n");
+                break;
+            }
+            int removeWorked = remove(currentFileName);
+            fclose(currentFile);
+            break;
+        case 4 :
+            break;
+        default :
+            printf("\nNombre hors champ.\n");
+            break;
+    }
+}
+
+void afficherMenuGererlexique() {
+    printf("\nVeuillez choisir une instruction : \n\n");
+    printf("1 : Afficher la liste des lexiques\n");
+    printf("2 : Afficher le contenu du lexique\n");
+    printf("3 : Supprimer un lexique\n");
+    printf("4 : Annuler\n");
+}
+
+void afficherMenuModifierLexique() {
+    printf("\nVeuillez choisir une instruction : \n\n");
+    printf("1 : Supprimer une entrée\n");
+    printf("2 : Renommer un lexique\n");
+    printf("3 : Annuler\n");
+}
+
+void actionModifierlexique() {
+    afficherMenuModifierLexique();
+    int choix = choixMenu();
+    switch(choix) {
+        case 1 :
+            
+        case 2 :
+            char *currentFileName = NULL;
+            printf("Selectionner un lexique : \n");
+            FILE *currentFile = NULL;
+            currentFile = SelectionLexiqueDansDossier(&currentFileName);
+            if(currentFile == NULL) {
+                printf("Il n'y a pas de lexiques crees !\n\n");
+                break;
+            }
+            char *nouveauNom = NULL;
+            nouveauNom = malloc(sizeof(char)*25);
+            printf("Veuillez entrer un nom.\n");
+            nouveauNom = fgets(nouveauNom, sizeof(char)*20, stdin);
+            int renameSuccessul = rename(currentFileName, nouveauNom);
+        default :
+    }
 }

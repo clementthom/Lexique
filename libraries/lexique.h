@@ -12,6 +12,11 @@ void actionMenu(int choix);
 FILE *SelectionLexiqueDansDossier(char **nomLexique);
 char *entrerMot(int nbChar);
 char *lireLigne(FILE *fichier, int numeroLigne);
+void actionGererlexique();
+void afficherMenuGererlexique();
+void afficherMenuModifierLexique();
+void actionModifierlexique();
+
 
 
 #endif
