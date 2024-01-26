@@ -252,7 +252,7 @@ void actionGererlexique() {
                 break;
             }
             break;
-        case 3 :
+        case 3 : // supprimer fichier
             printf("Selectionner un lexique : \n");
             currentFile = fopen(currentFileName, "a+");
             currentFile = SelectionLexiqueDansDossier(&currentFileName);
@@ -290,9 +290,9 @@ void actionModifierlexique() {
     afficherMenuModifierLexique();
     int choix = choixMenu();
     switch(choix) {
-        case 1 :
+        case 1 : // supprimer une entrée
             
-        case 2 :
+        case 2 : //renommer un lexique
             char *currentFileName = NULL;
             printf("Selectionner un lexique : \n");
             FILE *currentFile = NULL;
@@ -300,12 +300,17 @@ void actionModifierlexique() {
             if(currentFile == NULL) {
                 printf("Il n'y a pas de lexiques crees !\n\n");
                 break;
-            }
+            }//à ce stade on a obtenu le nom du fichier -> utilisé dans rename
             char *nouveauNom = NULL;
             nouveauNom = malloc(sizeof(char)*25);
-            printf("Veuillez entrer un nom.\n");
+            printf("\nVeuillez entrer un nom.\n");
             nouveauNom = fgets(nouveauNom, sizeof(char)*20, stdin);
-            int renameSuccessul = rename(currentFileName, nouveauNom);
+            //fclose(currentFile);//on doit fermer le fichier pour le renommer
+            int renameSuccessful = rename(currentFileName, nouveauNom);
+            if (renameSuccessful != 0) {
+                perror("Error");//motre le type d'erreur
+            }
+            printf("\nFichier renommé avec succes.Nouveau nom : .\n");
         default :
     }
 }
