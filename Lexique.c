@@ -9,7 +9,7 @@
 #include "libraries\main6.h"
 #include "libraries\main7.h"
 #include "libraries\lexique.h"
-
+#include "inputs\inputs.h"
 
 
 int main(int args, char *argv[]) {
@@ -97,24 +97,7 @@ void afficherMenu() {
 }
 
 int choixMenu() {
-    int choixMenu = 0;
-
-    const int bufsize = 100;
-    char buf[bufsize];
-
-    int ret;
-    // char word[bufsize];
-    fgets(buf, bufsize, stdin);
-
-    ret = sscanf(buf, "%d", &choixMenu);
-
-    if (ret != 1) {
-        fprintf(stderr, "J'ai dit un nombre abruti !!!\n");
-        return 0;
-    }
-
-    printf("\n%d", choixMenu);
-    return choixMenu;
+    return inputInt(1);
 }
 
 
