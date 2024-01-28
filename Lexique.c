@@ -157,7 +157,7 @@ void actionMenu(int choix) {
     }
 }
 
-FILE *SelectionLexiqueDansDossier(char **nomLexique) { //on va modifier nomLexique dans la fonction
+FILE *SelectionLexiqueDansDossier(char *nomLexique) { //on va modifier nomLexique dans la fonction
     WIN32_FIND_DATA File; 
     HANDLE hSearch;
     HANDLE hSearch2; 
@@ -189,8 +189,11 @@ FILE *SelectionLexiqueDansDossier(char **nomLexique) { //on va modifier nomLexiq
         for (int i = 1; i<choixLexique; i++) {
             FindNextFile(hSearch, &File);
         }
-        *(nomLexique) =  File.cFileName;//le nom du fichier est donné en RAM avec .txt
-        fichier = fopen(*(nomLexique), "a+"); 
+        for (int i = 0; i < 25; i++) {
+            nomLexique[i] = File.cFileName[i];
+        }
+        //*(nomLexique) =  File.cFileName;//le nom du fichier est donné en RAM avec .txt
+        fichier = fopen(nomLexique, "a+"); 
         FindClose(hSearch2);    
     }
     return fichier; 
@@ -243,10 +246,10 @@ void actionGererlexique() {
             scanDir();
             break;
         case 2 :
-            char *currentFileName = NULL;
+            char currentFileName[25];
             printf("Selectionner un lexique : \n");
             FILE *currentFile = NULL;
-            currentFile = SelectionLexiqueDansDossier(&currentFileName);
+            currentFile = SelectionLexiqueDansDossier(currentFileName);
             if(currentFile == NULL) {
                 printf("Il n'y a pas de lexiques crees !\n\n");
                 break;
@@ -255,7 +258,7 @@ void actionGererlexique() {
         case 3 : // supprimer fichier
             printf("Selectionner un lexique : \n");
             currentFile = fopen(currentFileName, "a+");
-            currentFile = SelectionLexiqueDansDossier(&currentFileName);
+            currentFile = SelectionLexiqueDansDossier(currentFileName);
             if(currentFile == NULL) {
                 printf("Il n'y a pas de lexiques crees !\n\n");
                 break;
@@ -293,18 +296,19 @@ void actionModifierlexique() {
         case 1 : // supprimer une entrée
             
         case 2 : //renommer un lexique
-            char *currentFileName = NULL;
+            char currentFileName[25];
+            char *nouveauNom = NULL;
+            nouveauNom = malloc(sizeof(char)*25);
             printf("Selectionner un lexique : \n");
-            FILE *currentFile = NULL;
-            currentFile = SelectionLexiqueDansDossier(&currentFileName);
+            FILE *currentFile = SelectionLexiqueDansDossier(currentFileName);
             if(currentFile == NULL) {
                 printf("Il n'y a pas de lexiques crees !\n\n");
                 break;
             }//à ce stade on a obtenu le nom du fichier -> utilisé dans rename
-            char *nouveauNom = NULL;
-            nouveauNom = malloc(sizeof(char)*25);
+            int test = 4;
+            printf("test");
             printf("\nVeuillez entrer un nom.\n");
-            nouveauNom = fgets(nouveauNom, sizeof(char)*20, stdin);
+            nouveauNom = fgets(nouveauNom, sizeof(char)*25, stdin);
             //fclose(currentFile);//on doit fermer le fichier pour le renommer
             int renameSuccessful = rename(currentFileName, nouveauNom);
             if (renameSuccessful != 0) {
