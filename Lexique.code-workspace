@@ -16,5 +16,9 @@
 			"path": "../../../MES DOCUMENTS/Entrainements perso/Entrainement C/EntrainementPendu"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"bit": "c"
+		}
+	}
 }
