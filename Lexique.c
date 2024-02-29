@@ -208,8 +208,11 @@ void entrerDonneeDansLexique(FILE *fichier) {
         printf("Entree trop longue ou incorrecte.\n");
         fgetsCheck = fgets(entree, sizeof(char) * 100, stdin);
     }
-
-
+    char *nomFichier = NULL;
+    nomFichier = malloc(sizeof(char)*200);
+    nomFichier = retournerNomFichier(trouverIndexFichier(fichier));
+    fopen(nomFichier, "a+");
+    fprintf(fichier, "%s", entree);
 }
 
 /**
