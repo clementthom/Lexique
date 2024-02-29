@@ -6,20 +6,15 @@ void creerFichier();
 int scanAfficheDir();
 int scanDir();
 void initialisationLexique();
-void afficherMenu();
+void afficherMenuPrincipal();
 int choixMenu();
-void actionMenu(int choix);
-FILE *selectionLexiqueDansDossier(char *nomLexique);
-int selectionnerFichierDansDossier();
-char *changerTitreFichier(int choixLexique, char *nomLexique);
-char *donnerNomFichier(FILE *fichier);
-FILE *renvoyerFichier(char *nomLexique);
-char *entrerMot(int nbChar);
-char *lireLigne(FILE *fichier, int numeroLigne);
-void actionGererlexique();
-void afficherMenuGererlexique();
-void afficherMenuModifierLexique();
-void actionModifierlexique();
+void actionMenuPrincipal(int choix);
+void ajouterEntreeLexique();
+FILE *selectionnerFichierDansDossier();
+FILE *retournerFichier(int indexFichier);
+void entrerDonneeDansLexique(FILE *fichier);
+int trouverIndexFichier(FILE *fichier);
+char *retournerNomFichier(int indexFichier); //ln227
 
 
 

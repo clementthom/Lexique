@@ -17,9 +17,9 @@ int main(int args, char *argv[]) {
     int choix = 2;
     initialisationLexique();
     do {
-        afficherMenu();
+        afficherMenuPrincipal();
         choix = choixMenu();
-        actionMenu(choix);
+        actionMenuPrincipal(choix);
         //exit(EXIT_FAILURE);
     } while (choix!=5);
 }
@@ -64,18 +64,20 @@ int scanAfficherDir() {
 
 int scanDir() { 
     WIN32_FIND_DATA File; 
-    HANDLE hSearch; 
+    HANDLE hSearch;
+    int totalFileNumber= 0; 
   
     hSearch = FindFirstFile("*.txt*", &File); 
     if (hSearch != INVALID_HANDLE_VALUE) 
     { 
         do { 
-            printf("%s\n", File.cFileName); 
+            printf("%s\n", File.cFileName);
+            totalFileNumber ++;
         } while (FindNextFile(hSearch, &File)); 
   
         FindClose(hSearch); 
     } 
-    return 0; 
+    return totalFileNumber; 
 }
 
 
@@ -86,14 +88,27 @@ void initialisationLexique() {
     
 }
 
-
-void afficherMenu() {
+void afficherMenuPrincipal() {
     printf("\nVeuillez choisir une instruction : \n\n");
     printf("1 : Creer un lexique\n");
     printf("2 : Ajouter une entree dans un lexique\n");
     printf("3 : Choisir un fichier a modifier\n");
     printf("4 : Gerer les lexiques\n");
     printf("5 : Quitter le logiciel\n");
+}
+
+void afficherMenuGererlexique() {
+    printf("\nVeuillez choisir une instruction : \n\n");
+    printf("1 : Afficher la liste des lexiques\n");
+    printf("2 : Afficher le contenu du lexique\n");
+    printf("3 : Supprimer un lexique\n");
+    printf("4 : Annuler\n");
+}
+void afficherMenuModifierLexique() {
+    printf("\nVeuillez choisir une instruction : \n\n");
+    printf("1 : Supprimer une entrée\n");
+    printf("2 : Renommer un lexique\n");
+    printf("3 : Annuler\n");
 }
 
 int choixMenu() {
@@ -117,232 +132,119 @@ int choixMenu() {
     return choixMenu;
 }
 
-
-void actionMenu(int choix) {
+void actionMenuPrincipal(int choix) {
     switch (choix) {
-        case 0 :
-            printf("Pas un nombre");
+        case 0 : 
+            printf("L'entree n'est pas un nombre.\n");
             break;
-        case 1 :
+        case 1 : 
             creerFichier();
             break;
         case 2 :
-            char currentFileName[25] = "pipoupipou";
-            printf("Selectionner un lexique : \n");
-            FILE *currentFile = NULL;
-            currentFile = selectionLexiqueDansDossier(currentFileName);
-            if(currentFile == NULL) {
-                printf("Il n'y a pas de lexiques crees !\n\n");
-                break;
-            }
-            //le & permet de changer la valeur du pointeur dans la fonction
-            printf("Entrer votre saisie (200 caractères max) : \n");
-            fprintf(currentFile, " - ");
-            fprintf(currentFile, "%s", entrerMot(200));
-            fclose(currentFile);
-            break;
-        case 3 :
-            //actionModifierlexique();
-            break;
-        case 4 :
-            //actionGererlexique();
-            break;
-        case 5 :
-            printf("\nAu revoir\n");
-            exit(EXIT_FAILURE);
-            break;
-        default :
-            printf("\nNombre hors champ.\n");
+            ajouterEntreeLexique();
             break;
     }
+
 }
 
-FILE *selectionLexiqueDansDossier(char *nomLexique) { //on va modifier nomLexique dans la fonction
-    
-    WIN32_FIND_DATA File; 
-    HANDLE hSearch;
-
+void ajouterEntreeLexique() {
     FILE *fichier = NULL;
-    int choixFichier = selectionnerFichierDansDossier();
-    char *nomFichier = changerTitreFichier(choixFichier, nomLexique);
-    fichier = renvoyerFichier(nomLexique);
-    FindClose(hSearch);
-
-    return fichier;
+    fichier = selectionnerFichierDansDossier();
+    entrerDonneeDansLexique(fichier);
 }
 
-int selectionnerFichierDansDossier() {
-    WIN32_FIND_DATA File; 
-    HANDLE hSearch;
-    //affiche les fichiers texte
-    hSearch = FindFirstFile("*.txt*", &File);
-
-    int fileIndex = 0; 
-    if (hSearch != INVALID_HANDLE_VALUE) 
-    { 
-        do { 
-            fileIndex ++;
-            printf("%d : %s\n", fileIndex, File.cFileName); 
-        } while (FindNextFile(hSearch, &File)); 
-  
-        FindClose(hSearch); 
-    }
-    //selectionner l'index du fichier texte
-    int choixLexique = choixMenu();//choixMenu sert ici à selectionner un entier
-    while(choixLexique<=0 || choixLexique>fileIndex) {
-        printf("\n\nHors champ. \n Reentrez un nombre.\n\n");
-        choixLexique = choixMenu();
-    }
-    return choixLexique;
-}
-
-char *changerTitreFichier(int choixLexique, char *nomLexique) {
+FILE *selectionnerFichierDansDossier() {
     WIN32_FIND_DATA File;
     HANDLE hSearch;
-
-    hSearch = FindFirstFile("*.txt*", &File);
-    if (hSearch != INVALID_HANDLE_VALUE){
-        for (int i =0; i<choixLexique; i++) { 
-            FindNextFile(hSearch, &File); 
-        }
-        int i = 0;
-        while(nomLexique[i] != '\0' /*|| File.cFileName[i]!='\0'*/) {
-            //nomLexique[i] = File.cFileName[i];
-            i++;
-        }   
-    } 
-    
-}
-
-FILE *renvoyerFichier(char *nomLexique) {
-
-    WIN32_FIND_DATA File; 
-    HANDLE hSearch;
-
-
     FILE *fichier = NULL;
-    fichier = fopen(nomLexique, "a+");
+
+    //3 étapes dans cette fonction
+    //1 : on affiche les fichiers
+    int numberOfFiles = scanDir();
+    //2 : on selectionne le fichier voulu
+    printf("Veuillez choisir un nombre.\n");
+    int choix = choixMenu();
+    while(choix <1 || choix>numberOfFiles) {
+        if (choix == 0) {
+            printf("Saisie incorrecte. Veuillez entrer un nombre.\n");
+        }
+        if (choix > numberOfFiles || choix < 0) {
+            printf("Nombre hors champ.\n");
+        }
+        printf("Veuillez saisir un nombre.\n");
+        choix = choixMenu();
+    }
+    //3 : on selectionne le fichier (voir la fonction retournerFichier)
+    fichier = retournerFichier(choix);
     return fichier;
 }
 
+FILE *retournerFichier(int indexFichier) {
+    WIN32_FIND_DATA File;
+    HANDLE hSearch;
+    FILE *fichier = NULL;
 
-
-char *entrerMot(int nbChar) { //permet de renvoyer des mots de nbChar caractères
-    char *mot = NULL;
-    mot = malloc(sizeof(char)*nbChar+5); //+5 par sécurité
-    mot = fgets(mot, sizeof(char) * nbChar, stdin);
-    /*while(*mot = EOF){
-        printf("Saisie trop longue. Veuillez essayer avec moins de caractères.");
-        mot = fgets(mot, sizeof(char) * 10, stdin);
-    }*/
-    return mot;
-    
-}
-
-char *lireLigne(FILE *fichier, int numeroLigne) {//lit la ligne jusqu'au saut de ligne
-    char *contenuLigne = NULL;
-    contenuLigne = malloc(sizeof(fichier));
-    int nbSautDeLigneCurseur = 0;
-    fseek(fichier, 0, SEEK_SET);//on met le curseur au début du fichier
-    char caractereLu;    
-    do {
-        caractereLu = fgetc(fichier);
-        fseek(fichier, 1, SEEK_CUR); //on fait avancer le curseur de 1
-    }while(caractereLu != '\n');
-        nbSautDeLigneCurseur ++;
-    fseek(fichier, 1, SEEK_CUR);//on est à la ligne souhaitée
-    int tailleLigne = 1;
-    caractereLu = fgetc(fichier);
-    while(caractereLu != '\n') {
-        *(&contenuLigne+1) = &caractereLu;
-        caractereLu = fgetc(fichier);
+    hSearch = FindFirstFile("*.txt", &File);
+    char *nomFichier = NULL;
+    if (hSearch != INVALID_HANDLE_VALUE) {
+        for (int i = 0; i < indexFichier; i++) {
+            FindNextFile(hSearch, &File);
+            nomFichier = malloc(sizeof(char)*100);
+            nomFichier = File.cFileName;
+        }
+        FindClose(hSearch); 
     }
-    printf("%s", &contenuLigne);
-    printf("hoa");
-    return contenuLigne;
-}
+    fichier = fopen(nomFichier, "r+");
+    fclose(fichier);
+    return fichier;
+} 
 
-/*void actionGererlexique() {
-    afficherMenuGererlexique();
-    int choix = choixMenu();
-    switch(choix) {
-        case 0 :
-            printf("Pas un nombre");
-            break;
-        case 1 :
-            printf("\nVoici la liste des fichiers : \n");
-            scanDir();
-            break;
-        case 2 :
-            char currentFileName[25];
-            printf("Selectionner un lexique : \n");
-            FILE *currentFile = NULL;
-            currentFile = selectionLexiqueDansDossier(currentFileName);
-            if(currentFile == NULL) {
-                printf("Il n'y a pas de lexiques crees !\n\n");
-                break;
-            }
-            break;
-        case 3 : // supprimer fichier
-            printf("Selectionner un lexique : \n");
-            currentFile = fopen(currentFileName, "a+");
-            currentFile = SelectionLexiqueDansDossier(currentFileName);
-            if(currentFile == NULL) {
-                printf("Il n'y a pas de lexiques crees !\n\n");
-                break;
-            }
-            int removeWorked = remove(currentFileName);
-            fclose(currentFile);
-            break;
-        case 4 :
-            break;
-        default :
-            printf("\nNombre hors champ.\n");
-            break;
+void entrerDonneeDansLexique(FILE *fichier) {
+    char *entree = NULL;
+    entree = malloc(sizeof(char)*100);
+    printf("Veuillez saisir l'entree a ajouter:\n");
+    char *fgetsCheck = fgets(entree, sizeof(char) * 100, stdin);
+    while (!fgetsCheck){
+        printf("Entree trop longue ou incorrecte.\n");
+        fgetsCheck = fgets(entree, sizeof(char) * 100, stdin);
     }
+
+
 }
 
-void afficherMenuGererlexique() {
-    printf("\nVeuillez choisir une instruction : \n\n");
-    printf("1 : Afficher la liste des lexiques\n");
-    printf("2 : Afficher le contenu du lexique\n");
-    printf("3 : Supprimer un lexique\n");
-    printf("4 : Annuler\n");
-}
+/**
+ * permet de relever l'index d'un fichier en particulier dans son dossier
+ * @param : fichier (FILE) dont on veut connaitre l'index
+ * @return : la position (int) du fichier dans son dossier
 */
-void afficherMenuModifierLexique() {
-    printf("\nVeuillez choisir une instruction : \n\n");
-    printf("1 : Supprimer une entrée\n");
-    printf("2 : Renommer un lexique\n");
-    printf("3 : Annuler\n");
-}
+int trouverIndexFichier(FILE *fichier) {
+    WIN32_FIND_DATA File;
+    HANDLE hSearch;
+    int index = 1;
 
-void actionModifierlexique() {
-    afficherMenuModifierLexique();
-    int choix = choixMenu();
-    switch(choix) {
-        case 1 : // supprimer une entrée
-            
-        case 2 : //renommer un lexique
-            char currentFileName[25];
-            char *nouveauNom = NULL;
-            nouveauNom = malloc(sizeof(char)*25);
-            printf("Selectionner un lexique : \n");
-            FILE *currentFile = selectionLexiqueDansDossier(currentFileName);
-            if(currentFile == NULL) {
-                printf("Il n'y a pas de lexiques crees !\n\n");
-                break;
-            }//à ce stade on a obtenu le nom du fichier -> utilisé dans rename
-            int test = 4;
-            printf("test");
-            printf("\nVeuillez entrer un nom.\n");
-            nouveauNom = fgets(nouveauNom, sizeof(char)*25, stdin);
-            //fclose(currentFile);//on doit fermer le fichier pour le renommer
-            int renameSuccessful = rename(currentFileName, nouveauNom);
-            if (renameSuccessful != 0) {
-                perror("Error");//motre le type d'erreur
+    hSearch = FindFirstFile("*.txt", &File);
+    if(hSearch != INVALID_HANDLE_VALUE) {
+        do{
+            if(fichier == fopen(File.cFileName, "a+")) {
+                return index;
             }
-            printf("\nFichier renommé avec succes.Nouveau nom : .\n");
-        default :
+            index++;
+        }while(FindNextFile(hSearch, &File));
     }
+    return 0; //erreur si 0 retourné
 }
+ char *retournerNomFichier(int indexFichier) {
+    WIN32_FIND_DATA File;
+    HANDLE hSearch;
+    char *nomFichier;
+
+    hSearch = FindFirstFile("*.txt", &File);
+    if (hSearch != INVALID_HANDLE_VALUE) {
+        for (int i =1; i<indexFichier; i++) {
+            FindNextFile(hSearch, &File);
+        }
+        nomFichier = File.cFileName;
+    }
+
+    return nomFichier;
+ }
