@@ -28,12 +28,12 @@ int main(int args, char *argv[]) {
 
 void creerFichier() {
     char *nomLexique = NULL;
-    nomLexique = malloc(sizeof(char) * 10);
+    nomLexique = malloc(sizeof(char) * 30);
     printf("\n\nChoisissez un nom de fichier : \n");
-    nomLexique = fgets(nomLexique, sizeof(char) * 10, stdin);
+    nomLexique = fgets(nomLexique, sizeof(char) * 30, stdin);
     FILE *lexique = NULL;
     char *nomFichier = NULL;
-    nomFichier = malloc(sizeof(char) * 15); 
+    nomFichier = malloc(sizeof(char) * 34); 
     nomLexique[strlen(nomLexique)-1] = '\0';
     nomFichier = strcat(nomLexique, ".txt");
     lexique = fopen(nomFichier, "a+");
@@ -70,9 +70,10 @@ int scanDir() {
     hSearch = FindFirstFile("*.txt*", &File); 
     if (hSearch != INVALID_HANDLE_VALUE) 
     { 
-        do { 
-            printf("%s\n", File.cFileName);
+        do {
             totalFileNumber ++;
+            printf("%d : ", totalFileNumber); 
+            printf("%s\n", File.cFileName);
         } while (FindNextFile(hSearch, &File)); 
   
         FindClose(hSearch); 
@@ -127,8 +128,6 @@ int choixMenu() {
         fprintf(stderr, "J'ai dit un nombre abruti !!!\n");
         return 0;
     }
-
-    printf("\n%d", choixMenu);
     return choixMenu;
 }
 
@@ -143,14 +142,44 @@ void actionMenuPrincipal(int choix) {
         case 2 :
             ajouterEntreeLexique();
             break;
+        case 3 :
+            afficherMenuModifierLexique();
+            actionModifierLexique();
+            break;
+        case 4 :
+            afficherMenuGererlexique();
+            actionGererLexique();
+            break;
+        case 5 :
+            printf("\nPassez une bonne journee.\n\n");
+            break;
+        default :
+            printf("\nIndex non propose dans le menu.\n Veuillez retenter en entrant une saisie valide.\n\n");
+            break;
     }
-
 }
 
 void ajouterEntreeLexique() {
     FILE *fichier = NULL;
     fichier = selectionnerFichierDansDossier();
-    entrerDonneeDansLexique(fichier);
+    int repeterAjouterEntreeLexique = 1;
+    while(repeterAjouterEntreeLexique == 1) {
+        entrerDonneeDansLexique(fichier);
+        printf("\nInserer autre chose dans ce lexique ?\n");
+        printf("\n1 : Oui\n2 : Non\n");
+        repeterAjouterEntreeLexique = choixMenu();
+        while(repeterAjouterEntreeLexique!=1 && repeterAjouterEntreeLexique !=2) {
+            printf("Valeur invalide. Veuillez entrer 1 ou 2.\n");
+            repeterAjouterEntreeLexique = choixMenu();
+        }
+        if(repeterAjouterEntreeLexique==1) {
+            repeterAjouterEntreeLexique==1;
+        }
+        if(repeterAjouterEntreeLexique==2) {
+            repeterAjouterEntreeLexique==0;
+        }
+    } 
+    
 }
 
 FILE *selectionnerFichierDansDossier() {
@@ -210,9 +239,15 @@ void entrerDonneeDansLexique(FILE *fichier) {
     }
     char *nomFichier = NULL;
     nomFichier = malloc(sizeof(char)*200);
-    nomFichier = retournerNomFichier(trouverIndexFichier(fichier));
+    //on ne peut par directement affecter le pointeur à la fonction,
+    //car l'adresse se retrouve changer (celle du retour de la fonction)
+    //donc dès qu'on sort du return le pointeur est vide (la fonction ne retourne rien)
+    //on utilise donc strcpy
+    strcpy(nomFichier, retournerNomFichier(trouverIndexFichier(fichier)));
     fopen(nomFichier, "a+");
-    fprintf(fichier, "%s", entree);
+    fprintf(fichier, "%s", entree); //retour à la ligne automatique
+    fclose(fichier);
+    free(nomFichier);
 }
 
 /**
@@ -248,6 +283,132 @@ int trouverIndexFichier(FILE *fichier) {
         }
         nomFichier = File.cFileName;
     }
-
     return nomFichier;
  }
+
+ void actionModifierLexique() {
+    int choixModifierFichier = choixMenu();
+    while (choixModifierFichier > 3 || choixModifierFichier <= 0) {
+        printf("Nombre trop grand ou trop petit");
+        choixModifierFichier = choixMenu();
+    }
+    switch(choixModifierFichier) {
+        case 1 :
+            //supprimerEntree();
+            break;
+        case 2 :
+            renommerLexique();
+        default :
+            break;    
+    }   
+ }
+
+void renommerLexique() {
+    FILE *fichier = NULL;
+    fichier = malloc(sizeof(FILE));
+    fichier = selectionnerFichierDansDossier();
+
+    char *nomFichier = NULL;
+    nomFichier = malloc(sizeof(char)*200);
+    strcpy(nomFichier, retournerNomFichier(trouverIndexFichier(fichier)));
+
+    char *nouveauNom = NULL;
+    nouveauNom = malloc(sizeof(char)*200);
+    nouveauNom = "Kebab.txt";
+    printf("%d",rename(nomFichier, nouveauNom));    
+
+    free(fichier);
+    free(nomFichier);
+}
+
+
+void actionGererLexique() {
+    int choixGererFichier = choixMenu();
+    while (choixGererFichier > 4 || choixGererFichier <= 0) {
+        printf("Nombre trop grand ou trop petit");
+        choixGererFichier = choixMenu();
+    }
+    switch(choixGererFichier) {
+        case 1 :
+            scanAfficherDir();
+            break;
+        case 2 :
+            afficherContenuLexique();
+            break;
+        case 3 :
+            supprimerLexique();
+            break;
+        default :
+            break;    
+    }   
+ }
+
+ void afficherContenuLexique() {
+    FILE *fichier = NULL;
+    fichier = malloc(sizeof(FILE));
+    fichier = selectionnerFichierDansDossier();
+
+    char *nomFichier = NULL;
+    nomFichier = malloc(sizeof(char)*200);
+    strcpy(nomFichier, retournerNomFichier(trouverIndexFichier(fichier)));
+    fopen(nomFichier, "a+");
+
+    scannerFichier(fichier);
+
+    free(nomFichier);
+
+ }
+
+ void supprimerLexique() {
+    FILE *fichier = NULL;
+    fichier = malloc(sizeof(FILE));
+    fichier = selectionnerFichierDansDossier();
+
+    char *nomFichier = NULL;
+    nomFichier = malloc(sizeof(char)*200);
+    strcpy(nomFichier, retournerNomFichier(trouverIndexFichier(fichier)));
+
+    printf("%d", remove(nomFichier));
+
+    free(nomFichier);
+ }
+
+EntreeLexique *initialiserTableauEntree(FILE *lexique) {
+    EntreeLexique *tableauEntrees = NULL;
+    tableauEntrees = malloc(sizeof(EntreeLexique)*50000);
+
+
+    return tableauEntrees;
+}
+//créer un tableau/liste d'entrées (contenu+numéro de ligne) et le renvoie*/
+
+void scannerFichier (FILE *lexique) {
+    EntreeLexique *tableauEntree = initialiserTableauEntree(lexique);
+    long positionCurseur = 0;
+    long nbLigne = 0;
+    char caractereLu = fgetc(lexique);
+    char *ligne = NULL;
+    ligne = malloc(sizeof(char)*500);
+    int nbSautdeLigneAffilee = 0; //permet de trouver la fin du lexique
+    while(nbSautdeLigneAffilee < 3) {
+        do {
+            caractereLu = fgetc(lexique);
+            printf("%c", caractereLu);//printf decale le curseur automatiquement
+            ligne[positionCurseur] = caractereLu;
+            if(caractereLu == '\n') {
+                nbSautdeLigneAffilee++;
+            }
+            else {
+                nbSautdeLigneAffilee = 0;
+            }
+            positionCurseur++;
+        }while(caractereLu != '\n');
+        nbLigne ++;
+    }
+    free(tableauEntree);
+}
+
+void afficherContenu (EntreeLexique *tableauEntree) {
+
+}
+
