@@ -355,7 +355,6 @@ void actionGererLexique() {
 
     scannerFichier(fichier);
 
-    free(nomFichier);
 
  }
 
@@ -369,6 +368,7 @@ void actionGererLexique() {
     strcpy(nomFichier, retournerNomFichier(trouverIndexFichier(fichier)));
 
     printf("%d", remove(nomFichier));
+    
 
     free(nomFichier);
  }
@@ -377,38 +377,49 @@ EntreeLexique *initialiserTableauEntree(FILE *lexique) {
     EntreeLexique *tableauEntrees = NULL;
     tableauEntrees = malloc(sizeof(EntreeLexique)*50000);
 
-
     return tableauEntrees;
 }
 //créer un tableau/liste d'entrées (contenu+numéro de ligne) et le renvoie*/
 
-void scannerFichier (FILE *lexique) {
+void scannerFichier(FILE *lexique) {
     EntreeLexique *tableauEntree = initialiserTableauEntree(lexique);
-    long positionCurseur = 0;
+    int positionCurseurSurLigne = 0; // nul au premier caractère d'une ligne
     long nbLigne = 0;
-    char caractereLu = fgetc(lexique);
+    char caractereLu = ' ';
+    caractereLu = fgetc(lexique);
     char *ligne = NULL;
     ligne = malloc(sizeof(char)*500);
+    
     int nbSautdeLigneAffilee = 0; //permet de trouver la fin du lexique
     while(nbSautdeLigneAffilee < 3) {
         do {
-            caractereLu = fgetc(lexique);
-            printf("%c", caractereLu);//printf decale le curseur automatiquement
-            ligne[positionCurseur] = caractereLu;
+            caractereLu = fgetc(lexique);//le curseur avance automatiquement ici
+            ligne[positionCurseurSurLigne] = caractereLu;
             if(caractereLu == '\n') {
                 nbSautdeLigneAffilee++;
             }
             else {
                 nbSautdeLigneAffilee = 0;
             }
-            positionCurseur++;
+            positionCurseurSurLigne++;
         }while(caractereLu != '\n');
+
+        tableauEntree[nbLigne].contenu = malloc(sizeof(char)*100); //obligé de le mettre là
+        strcpy(tableauEntree[nbLigne].contenu, ligne);
+        tableauEntree[nbLigne].ligne=nbLigne;
+
         nbLigne ++;
+        printf("%s", ligne);
+        strcpy(ligne, ""); //le meilleur moyen de réinitialiser une ligne
+        positionCurseurSurLigne=0;
     }
+    free(ligne);
+    afficherContenu(tableauEntree);
     free(tableauEntree);
 }
 
 void afficherContenu (EntreeLexique *tableauEntree) {
-
+    int indexEntree = 0;
+    printf("%s", tableauEntree[indexEntree].contenu);
 }
 

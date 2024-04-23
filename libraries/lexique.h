@@ -33,7 +33,7 @@ void afficherContenu (EntreeLexique *tableauEntree);
 
 struct EntreeLexique {
     int ligne;
-    char *contenu;
+    char *contenu; //on ne peut pas faire de malloc dans la déclaration de structure
 };
 
 
