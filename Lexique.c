@@ -374,10 +374,8 @@ void actionGererLexique() {
  }
 
 EntreeLexique *initialiserTableauEntree(FILE *lexique) {
-    EntreeLexique *tableauEntrees = NULL;
-    tableauEntrees = malloc(sizeof(EntreeLexique)*50000);
-
-    return tableauEntrees;
+    EntreeLexique tableauEntree[50000];
+    return tableauEntree;
 }
 //créer un tableau/liste d'entrées (contenu+numéro de ligne) et le renvoie*/
 
