@@ -372,52 +372,60 @@ void actionGererLexique() {
 
     free(nomFichier);
  }
-
-EntreeLexique *initialiserTableauEntree(FILE *lexique) {
-    EntreeLexique tableauEntree[50000];
-    return tableauEntree;
+//on ne peut pas renvoyer de tableau en C
+char *initialiserTableauEntree(FILE *lexique) {
+    char  *tableau = NULL;
+    tableau = malloc(sizeof(lexique));
+    printf("%d", sizeof(lexique));
+    return tableau;
 }
 //créer un tableau/liste d'entrées (contenu+numéro de ligne) et le renvoie*/
 
 void scannerFichier(FILE *lexique) {
-    EntreeLexique *tableauEntree = initialiserTableauEntree(lexique);
+    char *tableauEntree = initialiserTableauEntree(lexique);
     int positionCurseurSurLigne = 0; // nul au premier caractère d'une ligne
-    long nbLigne = 0;
+    long noLigneActuelle = 0; //à partir de la première entrée
+    long nbCaractereLu = 1;
     char caractereLu = ' ';
     caractereLu = fgetc(lexique);
-    char *ligne = NULL;
-    ligne = malloc(sizeof(char)*500);
-    
-    int nbSautdeLigneAffilee = 0; //permet de trouver la fin du lexique
-    while(nbSautdeLigneAffilee < 3) {
-        do {
-            caractereLu = fgetc(lexique);//le curseur avance automatiquement ici
-            ligne[positionCurseurSurLigne] = caractereLu;
-            if(caractereLu == '\n') {
-                nbSautdeLigneAffilee++;
-            }
-            else {
-                nbSautdeLigneAffilee = 0;
-            }
-            positionCurseurSurLigne++;
-        }while(caractereLu != '\n');
+    long nombreSautDeLigne = 0;
+    long nombreLignesTotal = obtenirNombreLignesTotal(lexique);
 
-        tableauEntree[nbLigne].contenu = malloc(sizeof(char)*100); //obligé de le mettre là
-        strcpy(tableauEntree[nbLigne].contenu, ligne);
-        tableauEntree[nbLigne].ligne=nbLigne;
+    char *tableauLexique[nombreLignesTotal][100]; //stocke les entrées dans un tableau 
 
-        nbLigne ++;
-        printf("%s", ligne);
-        strcpy(ligne, ""); //le meilleur moyen de réinitialiser une ligne
-        positionCurseurSurLigne=0;
-    }
-    free(ligne);
-    afficherContenu(tableauEntree);
-    free(tableauEntree);
+    do {
+        caractereLu = fgetc(lexique);
+        nbCaractereLu ++;
+        printf("%c", caractereLu);
+        if(caractereLu == '\n') {
+            nombreSautDeLigne++;
+        }
+    }while(nombreSautDeLigne<2);
+
+    do {
+        caractereLu = fgetc(lexique);
+        tableauLexique[nombreSautDeLigne-3][nbCaractereLu] = caractereLu;
+        nbCaractereLu ++;
+        printf("%c", caractereLu);
+        if(caractereLu == '\n') {
+            nombreSautDeLigne++;
+        }
+    }while(caractereLu != EOF);
 }
 
-void afficherContenu (EntreeLexique *tableauEntree) {
-    int indexEntree = 0;
-    printf("%s", tableauEntree[indexEntree].contenu);
+void afficherContenu (char *tableauEntree) {
+    
+}
+
+long obtenirNombreLignesTotal(FILE *lexique) {
+    char caractereLu = fgetc(lexique);
+    long nombreSautDeLigne = 0;
+    do {
+        caractereLu = fgetc(lexique);
+        printf("%c", caractereLu);
+        if(caractereLu == '\n') {
+            nombreSautDeLigne++;
+        }
+    }while(caractereLu != EOF);
 }
 

@@ -24,17 +24,17 @@ void renommerLexique();
 void actionGererLexique();
 void afficherContenuLexique();
 void supprimerLexique();
-EntreeLexique *initialiserTableauEntree(FILE *lexique);
-void scannerFichier (FILE *lexique);
-void afficherContenu (EntreeLexique *tableauEntree);
+char *initialiserTableauEntree(FILE *lexique);
+void scannerFichier(FILE *lexique);
+void afficherContenu (char *tableauEntree);
+long obtenirNombreLignesTotal(FILE *lexique);
 
 
 
 
-struct EntreeLexique {
-    int ligne;
-    char *contenu; //on ne peut pas faire de malloc dans la déclaration de structure
-};
+
+
+
 
 
 #endif
