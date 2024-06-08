@@ -355,7 +355,7 @@ void actionGererLexique() {
 
     scannerFichier(fichier);
 
-    free(fichier);
+    //free(fichier);
 }
 
  void supprimerLexique() {
@@ -387,23 +387,45 @@ long obtenirNombreLignesTotal(FILE *lexique) {
 
 void scannerFichier(FILE *lexique) {
     char *contenuLexique = NULL;
-    contenuLexique = malloc(sizeof(char)*100*obtenirNombreLignesTotal(lexique));
+    contenuLexique = malloc(sizeof(char)*100);
 
     char caractereLu=' ';
     int nombreCaracteresLu = 0;
 
-    while(caractereLu != '\n') {
-        fgetc(lexique);
-        contenuLexique += caractereLu;
+    while(caractereLu == ' ') {//enleve les caratères devant le titre
+            caractereLu = fgetc(lexique);
+            nombreCaracteresLu++;
     }
-    printf("%s", contenuLexique);
+    while(caractereLu != '\n') {
+        contenuLexique[nombreCaracteresLu] = caractereLu;
+        nombreCaracteresLu++;
+        caractereLu = fgetc(lexique);
+    }
+    while(caractereLu != EOF ) {
+        contenuLexique[nombreCaracteresLu]=caractereLu;
+        nombreCaracteresLu++;
+        caractereLu = fgetc(lexique);
+    }
 
-    free(contenuLexique);
+    afficherContenu(contenuLexique, lexique);
+    //free(contenuLexique);
 }
 
-void afficherContenu(char *contenuLexique) {
+void afficherContenu(char *contenuLexique, FILE *fichier) {
     char *entreeLexiqueCourante = NULL;
     entreeLexiqueCourante = malloc(sizeof(char)*100);
+    int nbLignesLues = 0;
+    int nbCaracteresLus = 0;
+    while(nbLignesLues<obtenirNombreLignesTotal(fichier)) {
+        nbLignesLues ++;
+        int positionCaractereSurLigne = 0;
+        while(entreeLexiqueCourante[positionCaractereSurLigne] != '\n') {
+            entreeLexiqueCourante[positionCaractereSurLigne] = contenuLexique[nbCaracteresLus];
+            nbCaracteresLus++;
+            positionCaractereSurLigne++; 
+        }
+        printf("%s", &entreeLexiqueCourante);
+    }
 }
 
 

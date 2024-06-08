@@ -26,7 +26,7 @@ void afficherContenuLexique();
 void supprimerLexique();
 long obtenirNombreLignesTotal(FILE *lexique);
 void scannerFichier(FILE *lexique);
-void afficherContenu(char *entreeTableauLexique);
+void afficherContenu(char *entreeTableauLexique, FILE *fichier);
 
 
 
