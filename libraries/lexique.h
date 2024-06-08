@@ -24,10 +24,10 @@ void renommerLexique();
 void actionGererLexique();
 void afficherContenuLexique();
 void supprimerLexique();
-char *initialiserTableauEntree(FILE *lexique);
-void scannerFichier(FILE *lexique);
-void afficherContenu (char *tableauEntree);
 long obtenirNombreLignesTotal(FILE *lexique);
+void scannerFichier(FILE *lexique);
+void afficherContenu(char *entreeTableauLexique);
+
 
 
 

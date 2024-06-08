@@ -355,8 +355,8 @@ void actionGererLexique() {
 
     scannerFichier(fichier);
 
-
- }
+    free(fichier);
+}
 
  void supprimerLexique() {
     FILE *fichier = NULL;
@@ -368,64 +368,42 @@ void actionGererLexique() {
     strcpy(nomFichier, retournerNomFichier(trouverIndexFichier(fichier)));
 
     printf("%d", remove(nomFichier));
-    
-
     free(nomFichier);
- }
-//on ne peut pas renvoyer de tableau en C
-char *initialiserTableauEntree(FILE *lexique) {
-    char  *tableau = NULL;
-    tableau = malloc(sizeof(lexique));
-    printf("%d", sizeof(lexique));
-    return tableau;
-}
-//créer un tableau/liste d'entrées (contenu+numéro de ligne) et le renvoie*/
-
-void scannerFichier(FILE *lexique) {
-    char *tableauEntree = initialiserTableauEntree(lexique);
-    int positionCurseurSurLigne = 0; // nul au premier caractère d'une ligne
-    long noLigneActuelle = 0; //à partir de la première entrée
-    long nbCaractereLu = 1;
-    char caractereLu = ' ';
-    caractereLu = fgetc(lexique);
-    long nombreSautDeLigne = 0;
-    long nombreLignesTotal = obtenirNombreLignesTotal(lexique);
-
-    char *tableauLexique[nombreLignesTotal][100]; //stocke les entrées dans un tableau 
-
-    do {
-        caractereLu = fgetc(lexique);
-        nbCaractereLu ++;
-        printf("%c", caractereLu);
-        if(caractereLu == '\n') {
-            nombreSautDeLigne++;
-        }
-    }while(nombreSautDeLigne<2);
-
-    do {
-        caractereLu = fgetc(lexique);
-        tableauLexique[nombreSautDeLigne-3][nbCaractereLu] = caractereLu;
-        nbCaractereLu ++;
-        printf("%c", caractereLu);
-        if(caractereLu == '\n') {
-            nombreSautDeLigne++;
-        }
-    }while(caractereLu != EOF);
-}
-
-void afficherContenu (char *tableauEntree) {
-    
 }
 
 long obtenirNombreLignesTotal(FILE *lexique) {
     char caractereLu = fgetc(lexique);
     long nombreSautDeLigne = 0;
+
     do {
         caractereLu = fgetc(lexique);
-        printf("%c", caractereLu);
+        //printf("%c", caractereLu);
         if(caractereLu == '\n') {
             nombreSautDeLigne++;
         }
     }while(caractereLu != EOF);
 }
+//on ne peut pas renvoyer de tableau en C
+
+void scannerFichier(FILE *lexique) {
+    char *contenuLexique = NULL;
+    contenuLexique = malloc(sizeof(char)*100*obtenirNombreLignesTotal(lexique));
+
+    char caractereLu=' ';
+    int nombreCaracteresLu = 0;
+
+    while(caractereLu != '\n') {
+        fgetc(lexique);
+        contenuLexique += caractereLu;
+    }
+    printf("%s", contenuLexique);
+
+    free(contenuLexique);
+}
+
+void afficherContenu(char *contenuLexique) {
+    char *entreeLexiqueCourante = NULL;
+    entreeLexiqueCourante = malloc(sizeof(char)*100);
+}
+
 
